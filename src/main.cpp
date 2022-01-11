@@ -10,28 +10,49 @@
 
 #include "emu/shader.h"
 
+class Vertex
+{
+  Eigen::Vector3f position;
+  Eigen::Vector3f color;
+
+public:
+  Vertex() = default;
+  Vertex(float x, float y, float z)
+  {
+    position << x, y, z;
+    color << x, y, z;
+  }
+};
+
 class Triangle
 {
   GLuint array_buffer_id_;
-  std::array<Eigen::Vector3f, 3> vertices_;
+  GLuint index_buffer_id_;
+
+  std::array<Vertex, 3> vertices_;
+  std::array<unsigned int, 3> indices_;
 
 public:
   Triangle()
   {
-    using Eigen::Vector3f;
-    vertices_[0] = Vector3f(-0.5, 0.0, 0.0);
-    vertices_[1] = Vector3f(0.5, 0.0, 0.0);
-    vertices_[2] = Vector3f(0.0, 1.0, 0.0);
+    vertices_[0] = Vertex(-0.5, 0.0, 0.0);
+    vertices_[1] = Vertex(0.5, 0.0, 0.0);
+    vertices_[2] = Vertex(0.0, 1.0, 0.0);
 
     glGenBuffers(1, &array_buffer_id_);
     glBindBuffer(GL_ARRAY_BUFFER, array_buffer_id_);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_), vertices_.data(), GL_STATIC_DRAW);
+
+    indices_ = { 0, 1, 2 };
+
+    glGenBuffers(1, &index_buffer_id_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_id_);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_), indices_.data(), GL_STATIC_DRAW);
   }
 
   void update(float x_pos, float y_pos)
   {
-    using Eigen::Vector3f;
-    vertices_[1] = Vector3f(x_pos, y_pos, 0.0);
+    vertices_[1] = Vertex(x_pos, y_pos, 0.0);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_), vertices_.data(), GL_STATIC_DRAW);
   }
 
@@ -39,14 +60,21 @@ public:
   {
     // draw vertex buffer data
     glBindBuffer(GL_ARRAY_BUFFER, array_buffer_id_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_id_);
+
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
     // specify how to interpret vertex buffer data
     // index, number of elements, type, normalize, stride, offset
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
     // primitive type, index of the first vertex to draw, number of vertices to process
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
   }
 };
 using TrianglePtr = std::unique_ptr<Triangle>;
