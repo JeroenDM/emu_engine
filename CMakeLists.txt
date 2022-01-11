@@ -10,8 +10,10 @@ else()
 endif()
 
 add_subdirectory(external/spdlog)
+add_subdirectory(external/eigen)
 
 find_package(spdlog)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -20,9 +22,19 @@ set(ON 1)
 
 include_directories(
     src
+    external/spdlog/include
+    external/eigen
     ${OPENGL_INCLUDE_DIRS}    
     ${GLEW_INCLUDE_DIRS}
     ${GLFW_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIRS}
 )
 
 add_executable(main src/main.cpp)
+target_link_libraries(main
+    spdlog
+    ${OPENGL_LIBRARIES}
+    ${GLEW_LIBRARIES}
+    glfw
+    ${GLFW_LIBRARIES}
+)

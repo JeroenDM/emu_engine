@@ -4,17 +4,19 @@
 #include <GLFW/glfw3.h>
 
 #include "spdlog/spdlog.h"
+#include "Eigen/Core"
 #include "emu/util.h"
 
 GLuint VBO;
 
 static void createAndFillVertexBuffer()
 {
+    using Eigen::Vector3f;
     // Vector3 vertices[3];
-    std::array<Vector3, 3> vertices;
-    vertices[0] = Vector3(-0.5, 0.0, 0.0);
-    vertices[1] = Vector3(0.5, 0.0, 0.0);
-    vertices[2] = Vector3(0.0, 1.0, 0.0);
+    std::array<Vector3f, 3> vertices;
+    vertices[0] = Vector3f(-0.5, 0.0, 0.0);
+    vertices[1] = Vector3f(0.5, 0.0, 0.0);
+    vertices[2] = Vector3f(0.0, 1.0, 0.0);
 
     glGenBuffers(1, &VBO);              // create handle
     glBindBuffer(GL_ARRAY_BUFFER, VBO); // bind handle to array buffer target
@@ -24,11 +26,12 @@ static void createAndFillVertexBuffer()
 
 void updateVertexBuffer(float x_pos, float y_pos)
 {
+    using Eigen::Vector3f;
     // Vector3 vertices[3];
-    std::array<Vector3, 3> vertices;
-    vertices[0] = Vector3(-0.5, 0.0, 0.0);
-    vertices[1] = Vector3(x_pos, y_pos, 0.0);
-    vertices[2] = Vector3(0.0, 1.0, 0.0);
+    std::array<Vector3f, 3> vertices;
+    vertices[0] = Vector3f(-0.5, 0.0, 0.0);
+    vertices[1] = Vector3f(x_pos, y_pos, 0.0);
+    vertices[2] = Vector3f(0.0, 1.0, 0.0);
 
     // glGenBuffers(1, &VBO);              // create handle
     // glBindBuffer(GL_ARRAY_BUFFER, VBO); // bind handle to array buffer target
